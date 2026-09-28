@@ -1,0 +1,25 @@
+{
+  "name": "autem-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.23.0",
+  "scripts": {
+    "supabase:login": "supabase login",
+    "supabase:link": "supabase link",
+    "db:push:dry": "supabase db push --dry-run",
+    "db:push": "supabase db push",
+    "functions:deploy": "supabase functions deploy invite-user",
+    "secrets:set": "supabase secrets set --env-file supabase/.env",
+    "types:remote": "supabase gen types typescript --linked > src/generated/database.types.ts",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "db:reset": "supabase db reset",
+    "db:test": "supabase test db",
+    "functions:serve": "supabase functions serve invite-user --env-file supabase/functions/.env"
+  },
+  "devDependencies": {
+    "supabase": "^2.118.0"
+  }
+}

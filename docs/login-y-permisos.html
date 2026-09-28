@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AUTEM · Login y permisos</title>
+    <style>
+      :root { --paper:#f6f1eb; --white:#fffdfa; --ink:#403a34; --muted:#766d63; --rule:#ded3c5; --gold:#c5a059; --gold-tint:#f2e8d5; --link:#526f82; --soft:#eee6dc; }
+      * { box-sizing: border-box; }
+      body { margin:0; background:var(--paper); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,sans-serif; }
+      main { width:min(1180px,calc(100% - 40px)); margin:0 auto; padding:64px 0 48px; }
+      .eyebrow { margin:0 0 12px; color:var(--muted); font:500 11px/1 ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:.13em; text-transform:uppercase; }
+      h1 { max-width:700px; margin:0; font:500 clamp(40px,6vw,72px)/.96 Georgia,serif; letter-spacing:-.045em; }
+      .lead { max-width:630px; margin:20px 0 52px; color:var(--muted); font-size:17px; line-height:1.6; }
+      section { padding:34px 0 42px; border-top:1px solid var(--rule); }
+      h2 { margin:0 0 10px; font:500 30px/1.1 Georgia,serif; letter-spacing:-.025em; }
+      .section-copy { max-width:710px; margin:0 0 28px; color:var(--muted); font-size:14px; line-height:1.55; }
+      .diagram { overflow-x:auto; border:1px solid var(--rule); border-radius:8px; background:var(--white); }
+      svg { display:block; width:100%; min-width:900px; height:auto; }
+      .cards { display:grid; grid-template-columns:1.15fr .95fr 1fr; gap:16px; margin-top:28px; }
+      .card { padding:20px; border:1px solid var(--rule); border-radius:8px; background:var(--white); }
+      .card h3 { margin:7px 0; font-size:15px; } .card p { margin:0; color:var(--muted); font-size:13px; line-height:1.55; }
+      .tag { color:var(--muted); font:500 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:.1em; text-transform:uppercase; }
+      footer { padding-top:20px; border-top:1px solid var(--rule); color:var(--muted); font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; }
+      @media (max-width:760px) { main { width:min(100% - 28px,1180px); padding-top:36px; } .cards { grid-template-columns:1fr; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">AUTEM BACKEND · DECISIÓN BASE</p>
+        <h1>Login con identidad, alcance y control real.</h1>
+        <p class="lead">Supabase Cloud valida a la persona; Postgres decide cada acceso mediante RLS. El navegador nunca recibe una clave secreta ni decide permisos.</p>
+      </header>
+
+      <section>
+        <p class="eyebrow">01 · ARQUITECTURA DE CONFIANZA</p>
+        <h2>De la pantalla a los datos privados</h2>
+        <p class="section-copy">El acceso ordinario viaja con un JWT. La única operación con privilegio elevado es la invitación, protegida en una Edge Function y limitada al superadministrador.</p>
+        <div class="diagram">
+          <svg viewBox="0 0 1120 500" role="img" aria-labelledby="autem-login-architecture-title autem-login-architecture-desc">
+            <title id="autem-login-architecture-title">Arquitectura de login y permisos de AUTEM</title>
+            <desc id="autem-login-architecture-desc">Diagrama que muestra el navegador, Supabase Auth, Edge Function de invitación, Postgres con RLS y Storage privado.</desc>
+            <defs>
+              <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#766d63" /></marker>
+              <marker id="arr-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#526f82" /></marker>
+              <marker id="arr-gold" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#c5a059" /></marker>
+            </defs>
+            <rect width="1120" height="500" fill="#fffdfa" />
+            <rect x="28" y="64" width="244" height="332" rx="8" fill="#f6f1eb" stroke="#ded3c5" />
+            <text x="44" y="88" fill="#766d63" font-family="DM Mono, monospace" font-size="8" letter-spacing="1.3">CLIENTE PÚBLICO</text>
+            <rect x="320" y="64" width="772" height="332" rx="8" fill="#f6f1eb" stroke="#ded3c5" />
+            <text x="336" y="88" fill="#766d63" font-family="DM Mono, monospace" font-size="8" letter-spacing="1.3">SUPABASE CLOUD · LÍMITE DE CONFIANZA</text>
+            <!-- connectors -->
+            <path d="M248 176 H304 Q312 176 312 184 V184 Q312 192 320 192" fill="none" stroke="#526f82" stroke-width="1.4" marker-end="url(#arr-link)" />
+            <path d="M432 244 V276 Q432 284 440 284 H504" fill="none" stroke="#526f82" stroke-width="1.4" marker-end="url(#arr-link)" />
+            <path d="M248 316 H296 Q304 316 304 324 V360 Q304 368 312 368 H568" fill="none" stroke="#c5a059" stroke-width="1.4" marker-end="url(#arr-gold)" />
+            <path d="M696 316 V344 Q696 352 704 352 H744" fill="none" stroke="#766d63" stroke-width="1.2" marker-end="url(#arr)" />
+            <path d="M568 316 V344 Q568 352 576 352 H744" fill="none" stroke="#766d63" stroke-width="1.2" marker-end="url(#arr)" />
+            <rect x="260" y="154" width="42" height="12" rx="2" fill="#fffdfa" /><text x="281" y="163" text-anchor="middle" fill="#526f82" font-family="DM Mono,monospace" font-size="8">LOGIN</text>
+            <rect x="449" y="252" width="44" height="12" rx="2" fill="#fffdfa" /><text x="471" y="261" text-anchor="middle" fill="#526f82" font-family="DM Mono,monospace" font-size="8">JWT</text>
+            <rect x="392" y="330" width="84" height="12" rx="2" fill="#fffdfa" /><text x="434" y="339" text-anchor="middle" fill="#9b762e" font-family="DM Mono,monospace" font-size="8">INVITACIÓN</text>
+            <!-- nodes -->
+            <g><rect x="52" y="144" width="196" height="96" rx="6" fill="#fffdfa" stroke="#403a34"/><text x="68" y="166" fill="#766d63" font-family="DM Mono,monospace" font-size="8">WEB · VITE</text><text x="68" y="193" fill="#403a34" font-family="DM Sans,sans-serif" font-size="14" font-weight="600">Panel AUTEM</text><text x="68" y="214" fill="#766d63" font-family="DM Mono,monospace" font-size="9">clave publicable + URL</text></g>
+            <g><rect x="52" y="284" width="196" height="96" rx="6" fill="#f2e8d5" stroke="#c5a059"/><text x="68" y="306" fill="#9b762e" font-family="DM Mono,monospace" font-size="8">USUARIO CON SESIÓN</text><text x="68" y="333" fill="#403a34" font-family="DM Sans,sans-serif" font-size="14" font-weight="600">Superadministrador</text><text x="68" y="354" fill="#766d63" font-family="DM Mono,monospace" font-size="9">único que invita y asigna rol</text></g>
+            <g><rect x="320" y="144" width="224" height="100" rx="6" fill="#fffdfa" stroke="#403a34"/><text x="336" y="166" fill="#766d63" font-family="DM Mono,monospace" font-size="8">AUTH</text><text x="336" y="193" fill="#403a34" font-family="DM Sans,sans-serif" font-size="14" font-weight="600">Supabase Auth</text><text x="336" y="214" fill="#766d63" font-family="DM Mono,monospace" font-size="9">identidad · sesión · JWT</text></g>
+            <g><rect x="504" y="276" width="192" height="88" rx="6" fill="#fffdfa" stroke="#403a34"/><text x="520" y="298" fill="#766d63" font-family="DM Mono,monospace" font-size="8">DATA API</text><text x="520" y="324" fill="#403a34" font-family="DM Sans,sans-serif" font-size="14" font-weight="600">Postgres + RLS</text><text x="520" y="345" fill="#766d63" font-family="DM Mono,monospace" font-size="9">grants · organización · proyecto</text></g>
+            <g><rect x="568" y="144" width="232" height="100" rx="6" fill="#f2e8d5" stroke="#c5a059"/><text x="584" y="166" fill="#9b762e" font-family="DM Mono,monospace" font-size="8">EDGE FUNCTION</text><text x="584" y="193" fill="#403a34" font-family="DM Sans,sans-serif" font-size="14" font-weight="600">invite-user</text><text x="584" y="214" fill="#766d63" font-family="DM Mono,monospace" font-size="9">valida solicitante antes de elevar</text></g>
+            <g><rect x="744" y="276" width="312" height="88" rx="6" fill="#eee6dc" stroke="#766d63"/><text x="760" y="298" fill="#766d63" font-family="DM Mono,monospace" font-size="8">PRIVADO</text><text x="760" y="324" fill="#403a34" font-family="DM Sans,sans-serif" font-size="14" font-weight="600">Storage por proyecto</text><text x="760" y="345" fill="#766d63" font-family="DM Mono,monospace" font-size="9">&lt;project-id&gt;/recurso/archivo</text></g>
+            <line x1="28" y1="430" x2="1092" y2="430" stroke="#ded3c5"/><text x="28" y="462" fill="#766d63" font-family="DM Mono,monospace" font-size="9">CLAVE PUBLICABLE EN EL NAVEGADOR</text><text x="396" y="462" fill="#766d63" font-family="DM Mono,monospace" font-size="9">CLAVE SECRETA SOLO EN EDGE FUNCTIONS</text><text x="804" y="462" fill="#766d63" font-family="DM Mono,monospace" font-size="9">RLS DECIDE LA FILA FINAL</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <p class="eyebrow">02 · FLUJO DE DECISIÓN</p>
+        <h2>La interfaz acompaña; la base de datos permite o niega.</h2>
+        <p class="section-copy">El rol visible sirve para ordenar la experiencia. RLS toma la decisión vinculante en cada solicitud, incluso si alguien modifica el navegador manualmente.</p>
+        <div class="diagram">
+          <svg viewBox="0 0 1120 420" role="img" aria-labelledby="autem-login-flow-title autem-login-flow-desc">
+            <title id="autem-login-flow-title">Flujo de login y evaluación de permisos</title>
+            <desc id="autem-login-flow-desc">Proceso desde el login hasta la decisión de RLS sobre un proyecto o archivo.</desc>
+            <defs><marker id="flow-arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#766d63" /></marker><marker id="flow-gold" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#c5a059" /></marker></defs>
+            <rect width="1120" height="420" fill="#fffdfa" />
+            <path d="M184 206 H208" fill="none" stroke="#766d63" stroke-width="1.2" marker-end="url(#flow-arr)"/><path d="M368 206 H392" fill="none" stroke="#766d63" stroke-width="1.2" marker-end="url(#flow-arr)"/><path d="M552 206 H576" fill="none" stroke="#766d63" stroke-width="1.2" marker-end="url(#flow-arr)"/><path d="M736 206 H760" fill="none" stroke="#c5a059" stroke-width="1.4" marker-end="url(#flow-gold)"/><path d="M848 280 V324 Q848 332 856 332 H960" fill="none" stroke="#766d63" stroke-width="1.2" marker-end="url(#flow-arr)"/><path d="M848 280 V324 Q848 332 840 332 H728" fill="none" stroke="#766d63" stroke-width="1.2" marker-end="url(#flow-arr)"/>
+            <g><rect x="24" y="158" width="160" height="96" rx="6" fill="#eee6dc" stroke="#766d63"/><text x="40" y="180" fill="#766d63" font-family="DM Mono,monospace" font-size="8">01</text><text x="40" y="209" fill="#403a34" font-family="DM Sans,sans-serif" font-size="14" font-weight="600">Email + contraseña</text><text x="40" y="230" fill="#766d63" font-family="DM Mono,monospace" font-size="9">signInWithPassword</text></g>
+            <g><rect x="208" y="158" width="160" height="96" rx="6" fill="#fffdfa" stroke="#403a34"/><text x="224" y="180" fill="#766d63" font-family="DM Mono,monospace" font-size="8">02</text><text x="224" y="209" fill="#403a34" font-family="DM Sans,sans-serif" font-size="14" font-weight="600">Sesión JWT</text><text x="224" y="230" fill="#766d63" font-family="DM Mono,monospace" font-size="9">identidad verificada</text></g>
+            <g><rect x="392" y="158" width="160" height="96" rx="6" fill="#fffdfa" stroke="#403a34"/><text x="408" y="180" fill="#766d63" font-family="DM Mono,monospace" font-size="8">03</text><text x="408" y="209" fill="#403a34" font-family="DM Sans,sans-serif" font-size="14" font-weight="600">Solicitud</text><text x="408" y="230" fill="#766d63" font-family="DM Mono,monospace" font-size="9">proyecto o archivo</text></g>
+            <g><rect x="576" y="158" width="160" height="96" rx="6" fill="#fffdfa" stroke="#403a34"/><text x="592" y="180" fill="#766d63" font-family="DM Mono,monospace" font-size="8">04</text><text x="592" y="209" fill="#403a34" font-family="DM Sans,sans-serif" font-size="14" font-weight="600">Membresías</text><text x="592" y="230" fill="#766d63" font-family="DM Mono,monospace" font-size="9">organización + proyecto</text></g>
+            <g><rect x="760" y="142" width="176" height="128" rx="6" fill="#f2e8d5" stroke="#c5a059"/><text x="776" y="164" fill="#9b762e" font-family="DM Mono,monospace" font-size="8">05 · DECISIÓN VINCULANTE</text><text x="776" y="196" fill="#403a34" font-family="DM Sans,sans-serif" font-size="15" font-weight="600">RLS + grants</text><text x="776" y="220" fill="#766d63" font-family="DM Mono,monospace" font-size="9">auth.uid() · alcance · operación</text><text x="776" y="240" fill="#766d63" font-family="DM Mono,monospace" font-size="9">no depende del frontend</text></g>
+            <g><rect x="960" y="314" width="136" height="68" rx="6" fill="#fffdfa" stroke="#403a34"/><text x="976" y="340" fill="#766d63" font-family="DM Mono,monospace" font-size="8">PERMITIDO</text><text x="976" y="362" fill="#403a34" font-family="DM Sans,sans-serif" font-size="13" font-weight="600">Datos mínimos</text></g>
+            <g><rect x="592" y="314" width="136" height="68" rx="6" fill="#fffdfa" stroke="#766d63"/><text x="608" y="340" fill="#766d63" font-family="DM Mono,monospace" font-size="8">DENEGADO</text><text x="608" y="362" fill="#403a34" font-family="DM Sans,sans-serif" font-size="13" font-weight="600">Error 403 / sin fila</text></g>
+          </svg>
+        </div>
+        <div class="cards"><article class="card"><p class="tag">Superadministrador</p><h3>Equipo, roles y organización</h3><p>Invita personas y define sus asignaciones. Es la única ruta con privilegio administrativo de usuarios.</p></article><article class="card"><p class="tag">Administrador</p><h3>Proyectos y contenido</h3><p>Gestiona los proyectos de la organización, sin otorgar ni modificar roles de otras personas.</p></article><article class="card"><p class="tag">Editor · Comercial</p><h3>Alcance por proyecto</h3><p>Actúan únicamente dentro de proyectos asignados: edición o consulta según la membresía.</p></article></div>
+      </section>
+      <footer>VERSIÓN BASE · SUPABASE CLOUD AHORA · FASTIFY + RAILWAY SOLO SI LA COMPLEJIDAD LO EXIGE</footer>
+    </main>
+  </body>
+</html>
