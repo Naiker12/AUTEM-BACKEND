@@ -1,38 +1,77 @@
 # AUTEM Backend
 
-Base de Supabase Cloud para autenticación, acceso por rol y permisos por proyecto.
+## Fase 1 · Login y acceso al panel
 
-No se ejecuta Docker en este equipo. El flujo principal trabaja directamente con
-un proyecto remoto de Supabase; Docker queda como una opción futura para pruebas
-locales aisladas o CI.
+Esta fase prepara el acceso seguro al panel de AUTEM con Supabase Cloud. Incluye
+login por email y contraseña, recuperación de acceso, invitación de usuarios y
+permisos por organización y proyecto.
 
-## Arquitectura
+## Cómo funciona
 
-- [Mapa de login y permisos](docs/login-y-permisos.html)
-- [Decisiones y puesta en marcha](docs/LOGIN_Y_DESPLIEGUE.md)
+1. La persona inicia sesión en el panel con email y contraseña.
+2. Supabase Auth valida la identidad y crea su sesión.
+3. El panel consulta los datos usando esa sesión.
+4. Postgres + RLS comprueban el rol y los proyectos asignados antes de devolver
+   cualquier información.
+5. Un superadministrador invita nuevas personas desde el panel; la función
+   `invite-user` valida su permiso antes de crear la invitación y asignaciones.
 
-## Primer enlace con Supabase Cloud
+La interfaz puede ocultar acciones que no correspondan, pero la decisión real
+siempre la toma la base de datos mediante RLS.
 
-1. Crea dos proyectos: `staging` y `producción`.
-2. En este directorio ejecuta `pnpm install` y `pnpm supabase:login`.
-3. Enlaza primero *staging*: `pnpm supabase:link --project-ref <project-ref>`.
-4. Copia `.env.example` a `supabase/.env` y define solo `PUBLIC_SITE_URL`.
-5. Revisa cambios: `pnpm db:push:dry`.
-6. Aplica migraciones: `pnpm db:push`.
-7. Sube la función segura de invitación: `pnpm functions:deploy`.
-8. Configura el redirect URL de invitaciones en Supabase Auth y el SMTP real.
+## Roles
 
-Nunca pongas una `service_role`/clave secreta en `D:\AUTEM`. Las funciones Edge
-reciben esa clave desde Supabase Cloud. El frontend solo usa la URL y una clave
-publicable, con RLS activado.
+| Rol | Puede hacer |
+| --- | --- |
+| **Superadministrador** | Gestionar equipo, invitaciones, roles, organización y todos los proyectos. |
+| **Administrador** | Gestionar proyectos y contenido de la organización, sin cambiar roles del equipo. |
+| **Editor** | Editar contenido únicamente en los proyectos asignados. |
+| **Comercial** | Consultar información de los proyectos asignados. |
 
-## Docker futuro
+Cada persona es un usuario autenticado. Su rol pertenece a la organización y
+puede complementarse con una asignación concreta por proyecto:
+`manager`, `editor` o `viewer`.
 
-Cuando haya espacio o se use CI: `pnpm supabase:start`, `pnpm db:reset` y
-`pnpm db:test`. Estos comandos no son necesarios para el despliegue Cloud.
+## Información que se guarda
+
+- `auth.users`: identidad y sesión, administradas por Supabase Auth.
+- `profiles`: nombre y avatar.
+- `organization_members`: rol dentro de AUTEM.
+- `projects` y `project_members`: proyectos y su alcance por persona.
+- Storage privado: imágenes, PDFs, videos y recursos 360 por proyecto.
+
+Los archivos privados deben usar esta estructura:
+
+```text
+<project-id-uuid>/<recurso>/<archivo>
+```
+
+## Claves
+
+En `D:\AUTEM\.env.local` solo van valores públicos:
+
+```env
+VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_<tu-clave-publica>
+```
+
+Nunca se suben al repositorio ni se usan en el navegador claves secretas,
+`service_role`, contraseñas o tokens privados.
+
+## Antes de activar usuarios reales
+
+1. Crear el proyecto de Supabase Cloud de *staging*.
+2. Enlazarlo con `pnpm supabase:link --project-ref <project-ref>`.
+3. Revisar la migración con `pnpm db:push:dry`.
+4. Aplicarla con `pnpm db:push`.
+5. Desplegar invitaciones con `pnpm functions:deploy`.
+6. Configurar SMTP y las URLs de redirección de login, recuperación e invitación
+   en Supabase Auth.
+7. Crear el primer superadministrador de forma controlada.
 
 ## Estructura
 
-- `supabase/migrations`: esquema y políticas RLS.
-- `supabase/seed.sql`: organización y proyecto de desarrollo.
-- `supabase/functions/invite-user`: invitación segura de usuarios.
+- `supabase/migrations`: modelo de datos y políticas RLS.
+- `supabase/functions/invite-user`: invitación segura de personas.
+- `docs/login-y-permisos.html`: diagrama visual del flujo.
+- `docs/LOGIN_Y_DESPLIEGUE.md`: decisiones técnicas ampliadas.
